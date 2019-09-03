@@ -5,22 +5,7 @@ from discord.ext import commands
 VERSION = '1.03'
 
 
-
-
-class Bot(commands.Bot):
-    async def send_cmd_help(self, ctx):
-        if ctx.invoked_subcommand:
-            pages = self.formatter.format_help_for(ctx, ctx.invoked_subcommand)
-            for page in pages:
-                await ctx.send(page)
-        else:
-            pages = await self.formatter.format_help_for(ctx, ctx.command)
-            for page in pages:
-                await ctx.send(page)
-
-
-bot = Bot("bb ", activity=discord.Game("Playing With My Food"))
-
+bot = commands.Bot("bb ", activity=discord.Game("Playing With My Food"))
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -35,7 +20,7 @@ async def on_command_error(ctx, error):
         except:
             pass
     if isinstance(error, commands.MissingRequiredArgument):
-        await bot.send_cmd_help(ctx)
+        await bot.help_command.send_command_help(ctx.command)
 
 
 async def is_owner(ctx):
