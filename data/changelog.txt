@@ -1,0 +1,6 @@
+version 1.02 added: Added a poll feature thanks kitty!
+
+Version 1.01 added: stop for dev
+
+Version 1.00
+Added commands: ping, commands, version
