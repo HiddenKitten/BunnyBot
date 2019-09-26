@@ -1,3 +1,5 @@
+version 1.04 added: dice function
+
 version 1.02 added: Added a poll feature thanks kitty!
 
 Version 1.01 added: stop for dev

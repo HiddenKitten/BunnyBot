@@ -1,8 +1,9 @@
 import asyncio
-import discord 
+import random
+import discord
 from discord.ext import commands
 
-VERSION = '1.03'
+VERSION = '1.04 indev'
 
 
 bot = commands.Bot("bb ", activity=discord.Game("Playing With My Food"))
@@ -68,6 +69,17 @@ async def _poll(ctx, text, *options):
 @bot.command(name="debug", hidden=True)
 async def _debug(ctx, *, code):
     await ctx.send('```python\n'+eval(code)+'\n```')
+
+@bot.command(name="dice")
+async def _dice(ctx, number):
+    try:
+        arg = random.randint(1, int(number))
+    except ValueError:
+        await ctx.send("Invalid number")
+    else:
+        await ctx.send(str(arg))
+
+
 
 @commands.has_role('BunnyBot Dev')
 @bot.command(name='stop', hidden=True)
