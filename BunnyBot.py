@@ -1,6 +1,7 @@
 import asyncio
 import random
 import discord
+import typing
 from discord.ext import commands
 
 VERSION = '1.04 indev'
@@ -71,13 +72,36 @@ async def _debug(ctx, *, code):
     await ctx.send('```python\n'+eval(code)+'\n```')
 
 @bot.command(name="dice")
-async def _dice(ctx, number):
-    try:
-        arg = random.randint(1, int(number))
-    except ValueError:
-        await ctx.send("Invalid number")
-    else:
-        await ctx.send(str(arg))
+async def _dice(ctx, number:typing.Optional[int]=6):
+    """roll a die"""
+    arg = random.randint(1, number)
+    await ctx.send(arg)
+
+@bot.command(name="info")
+async def _info(ctx, *, member: typing.Optional[discord.Member]):
+    """Tells you some info about the member"""
+    if member is None:
+        member = ctx.author
+    name = member.display_name
+    uid = member.id
+    status = member.status
+    joined = member.joined_at
+    highrole = member.top_role
+    e = discord.Embed(title=name+"'s info", description="description!", color=(highrole.colour if highrole.colour.value != 0 else 10070709))
+    e.add_field(name='Name', value=name)
+    e.add_field(name='User ID', value=uid)
+    e.add_field(name='Status', value=status)
+    e.add_field(name='Highest Role', value=highrole)
+    e.add_field(name='Join Date', value=joined)
+    await ctx.send(embed=e)
+
+@_info.error
+async def _info_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.send('I could not find that member...')
+
+
+
 
 
 
