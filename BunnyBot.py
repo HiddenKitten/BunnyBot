@@ -4,10 +4,10 @@ import discord
 import typing
 from discord.ext import commands
 
-VERSION = '1.04 indev'
+VERSION = '1.07 indev'
 
 
-bot = commands.Bot("bb ", activity=discord.Game("Playing With My Food"))
+bot = commands.Bot("bb ", activity=discord.Game("Eating Coins!"))
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -87,7 +87,7 @@ async def _info(ctx, *, member: typing.Optional[discord.Member]):
     status = member.status
     joined = member.joined_at
     highrole = member.top_role
-    e = discord.Embed(title=name+"'s info", description="description!", color=(highrole.colour if highrole.colour.value != 0 else 10070709))
+    e = discord.Embed(title=name+"'s info", description="Heres what I could find!", color=(highrole.colour if highrole.colour.value != 0 else 10070709))
     e.add_field(name='Name', value=name)
     e.add_field(name='User ID', value=uid)
     e.add_field(name='Status', value=status)
@@ -100,12 +100,26 @@ async def _info_error(ctx, error):
     if isinstance(error, commands.BadArgument):
         await ctx.send('I could not find that member...')
 
+@bot.command(name="age")
+async def _age(ctx, *, user:discord.User):
+    created = user.created_at
+    await ctx.send(user.created_at)
+
+@bot.command(name='avatar')
+async def _avatar(ctx, *, member:discord.Member):
+    member = ctx.author if member is None else member
+    em = discord.Embed(description='{0}, requested by:\n{1}'.format(member, ctx.author))
+    em.set_thumbnail(url=member.avatar_url)
+    await ctx.send(embed=em)
+
+@_avatar.error
+async def _avatar_error(ctx, error):
+    print(error)
 
 
 
 
-
-@commands.has_role('BunnyBot Dev')
+@commands.has_role('BunnyDev')
 @bot.command(name='stop', hidden=True)
 async def _stop(ctx):
     """shuts down the bot"""
