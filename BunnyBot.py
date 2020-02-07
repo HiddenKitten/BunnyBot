@@ -4,11 +4,11 @@ import discord
 import typing
 from discord.ext import commands
 
-VERSION = '1.07 indev'
+VERSION = 're-1.08'
 
 
 bot = commands.Bot("bb ", activity=discord.Game(
-    name="Telling Syko to Stop Eating Coins"))
+    name="Playing with my food!"))
 
 # Events
 @bot.event
@@ -26,6 +26,11 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await bot.help_command.send_command_help(ctx.command)
 
+@bot.event
+async def on_message(message):
+    if 'order 66' in message.content.lower():
+        await message.channel.send('It will be done, my Lord.')
+    await bot.process_commands(message)
 
 @bot.event
 async def on_ready():
@@ -127,6 +132,18 @@ async def _stop(ctx):
     await ctx.send("Shutting Down.")
     await bot.logout()
 
+@bot.command(name="serverinfo")
+async def _serverinfo(ctx):
+    """shows the guilds info"""
+    guild = ctx.guild
+    gname = guild.name
+    glocal = guild.region
+    gmember = [x.name+'#'+x.discriminator for x in guild.members]
+    e = discord.Embed(title=gname+"'s info", description="Heres what I could find!")
+    e.add_field(name="guild name", value=gname)
+    e.add_field(name="guild location", value=glocal)
+    e.add_field(name="members", value=gmember)
+    await ctx.send(embed=e)
 
 @bot.command(name="version")
 async def _version(ctx):
