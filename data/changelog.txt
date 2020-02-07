@@ -1,3 +1,5 @@
+version 1.08 added: lots of things lol we forgot this file I think.
+
 version 1.04 added: dice function
 
 version 1.02 added: Added a poll feature thanks kitty!
