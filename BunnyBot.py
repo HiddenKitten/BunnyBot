@@ -75,10 +75,18 @@ async def _debug(ctx, *, code):
 
 
 @bot.command(name="dice")
-async def _dice(ctx, number: typing.Optional[int] = 6):
-    """roll a die"""
-    arg = random.randint(1, number)
-    await ctx.send(arg)
+async def _dice(ctx, expression):
+    from dice import roll, DiceBaseException
+    try:
+        a = roll(expression)
+    except DiceBaseException as e:
+        await ctx.send('Error in expression:\n```{}\n{}```'.format(expression, e.pretty_print()))
+        return
+    if len(a) <= 50:
+        message = 'rolls = {}\ntotal={}'.format(a, sum(a))
+    else:
+        message = 'total={}'.format(sum(a))
+    await ctx.send(message)
 
 
 @bot.command(name="info")
