@@ -158,6 +158,11 @@ async def _version(ctx):
     """shows the version info"""
     await ctx.send("Version %s" % VERSION)
 
+@bot.command(name="patreon")
+async def _patreon(ctx):
+    """sends patreon link"""
+    await ctx.send("https://www.patreon.com/MeeMTeam")
+
 
 # Internals
 
