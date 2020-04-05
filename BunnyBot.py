@@ -76,16 +76,32 @@ async def _debug(ctx, *, code):
 
 @bot.command(name="dice")
 async def _dice(ctx, expression):
+    """🎲 rolls dice expressions.
+    
+    some modifiers supported:
+    6d6h3 will roll 6 dice and keep the 3 highest.
+    6d6l3 will roll 6 dice and keep the 3 lowest.
+    6d6r1 will roll 6 dice and reroll any 1s or lower *once*.
+    6d6rr1 will roll 6 dice and reroll any 1s or lower, making the minimum roll 2.
+    6d6a4 will count double for any 4s rolled.
+    6d6e3 will roll 6 dice and count the number equal or above 3.
+    6d6s will roll 6 dice and sort them lowest to highest.
+    6d6+3 will roll 6 dice then add 3 to the total.
+    6d6-3 will roll 6 dice then subtract 3 from the total.
+    """
     from dice import roll, DiceBaseException
     try:
         a = roll(expression)
     except DiceBaseException as e:
         await ctx.send('Error in expression:\n```{}\n{}```'.format(expression, e.pretty_print()))
         return
-    if len(a) <= 50:
-        message = 'rolls = {}\ntotal={}'.format(a, sum(a))
+    if isinstance(a, list):
+        if len(a) <= 50:
+            message = '🎲 {}\ntotal={}'.format(', '.join(a), sum(a))
+        else:
+            message = 'total 🎲 is {}'.format(sum(a))
     else:
-        message = 'total={}'.format(sum(a))
+        message = "total 🎲 is {} \nCurrently, multiple dice with modifiers is not fully supported.\nIf you need the individual dice values, please don't add a modifier.".format(a)
     await ctx.send(message)
 
 
