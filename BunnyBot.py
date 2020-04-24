@@ -2,13 +2,14 @@ import asyncio
 import discord
 import typing
 from discord.ext import commands
+from datetime import datetime, timedelta
 
 #static vars, read from config(s) later
 OWNERS = [266079468135776258, 89032716896460800]
 PATREON_EXT = 'MeeMTeam'
 
 #Version, basically self tracking our updates
-VERSION = 're-1.09'
+VERSION = 're-1.10'
 
 bot = commands.Bot("bb ", activity=discord.Game(
     name="Playing with my food!"))
@@ -30,7 +31,7 @@ async def on_command_error(ctx, error):
         return await ctx.send_help(ctx.command)
     elif isinstance(error, commands.CommandNotFound):
         return # ignore unfound commands for now. no reason to care, just would cause spam in console, or chat.
-    print("command '{}' with args '{}' raised exception: '{}'".format(ctx.command, ctx.message.content[len(ctx.invoked_with)+len(ctx.prefix)+2:], error.original))
+    print("command '{}' with args '{}' raised exception: '{}'".format(ctx.command, ctx.message.content[len(ctx.invoked_with)+len(ctx.prefix)+1:], error.original))
 
 @bot.event
 async def on_message(message):
@@ -54,7 +55,7 @@ async def is_owner(ctx):
 
 
 @bot.command(name='avatar')
-async def _avatar(ctx, *, member: typing.Optional[discord.Member]):
+async def _avatar(ctx, member: typing.Optional[discord.Member]):
     """Get someone's Avatar!"""
     member = ctx.author if member is None else member
     em = discord.Embed(
@@ -77,7 +78,7 @@ async def _debug(ctx, *, code):
     
     never trust user input.
     only anyone in the owners list can use this."""
-    await ctx.send('```python\n'+eval(code)+'\n```')
+    await ctx.send('```python\n'+exec(compile(code, "debug_command", 'exec'))+'\n```')
 
 
 @bot.command(name="dice", aliases=["roll", 'rd'])
@@ -202,6 +203,26 @@ async def _patreon(ctx):
     """sends patreon link"""
     await ctx.send("I'm glad you're thinking of supporting our work!\nhttps://www.patreon.com/" + PATREON_EXT)
 
+@commands.has_permissions(manage_messages=True)
+@bot.command(name="clean")
+async def _clean(ctx, last: int, user: typing.Optional[discord.Member], after: typing.Optional[discord.Message], before: typing.Optional[discord.Message]):
+    """cleans up messages.
+    
+    last: the last x messages to check. 
+    user: the user to delete.
+    after: after a specific message, specified by id.
+    before: before a specific message, specified by id.
+    note: bulk_delete on the api is limited to the last 14 days, regardless of input here."""
+
+
+    messages = await ctx.channel.history(limit=last, before=before, after=after).flatten()
+    def filter_function(x):
+        return x.created_at > (datetime.now() - timedelta(days=14)) and (x.author == user) if user else True
+    messages = list(filter(filter_function, messages))
+    chunks = [messages[x:x+100] for x in range(0, len(messages), 100)]
+    for i in chunks:
+        await ctx.channel.delete_messages(i)
+    await ctx.message.delete(delay=5)
 
 # Internals
 

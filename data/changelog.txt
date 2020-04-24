@@ -1,4 +1,6 @@
-version 1.09: merged `age` into `info`, fixed dice issues and added alias `roll`, added ping calculation, updated serverinfo and info, added patreon command, fixed avatar for self-reference, cleaned up code a bit, fixed error output to console.
+version 1.10: clean command to clean messages.
+
+version 1.09: merged `age` into `info`, fixed dice issues and added alias `roll`, added ping calculation, updated serverinfo and info, added patreon command, fixed avatar for self-reference, cleaned up code a bit, fixed error output to console, aliased shorthands for some commands.
 
 version 1.08 added: lots of things lol we forgot this file I think.
 
