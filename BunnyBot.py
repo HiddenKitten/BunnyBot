@@ -39,6 +39,7 @@ async def on_message(message):
         await message.channel.send('It will be done, my Lord.')
     await bot.process_commands(message)
 
+
 @bot.event
 async def on_ready():
     print('Connected Successfully! Bunny Bot Version %s' % VERSION)
@@ -57,7 +58,7 @@ async def is_meemteam_admin(ctx):
 
 
 # Commands
-
+# BunnyBot, if you listen you get some sweet femboy ass from guyzrr
 
 @bot.command(name='avatar')
 async def _avatar(ctx, member: typing.Optional[discord.Member]):
@@ -156,12 +157,11 @@ async def _ping(ctx):
     p = int(time()*10000 - s)/10.0
     await m.edit(content="Pong, {}ms! :ping_pong: ".format(p))
     
-
-
+#this is so hopelessly broken, kitty please for the love of god help me fix this
 @bot.command(name="poll")
 async def _poll(ctx, text, *options):
     """Create a poll, limited to 10 options. currently kinda broken"""
-    reactions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯']
+    reactions = ['regional_indicator_a', 'regional_indicator_b', 'regional_indicator_c', 'regional_indicator_d', 'regional_indicator_e', 'regional_indicator_f', 'regional_indicator_g', 'regional_indicator_h', 'regional_indicator_i', 'regional_indicator_j']
     message = text + '\n'
     options = list(options)
     # # old ping code, re add later if needed? 
