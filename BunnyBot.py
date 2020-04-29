@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 #static vars, read from config(s) later
 OWNERS = [266079468135776258, 89032716896460800]
 PATREON_EXT = 'MeeMTeam'
+POLL_CHANNELS = [390935424694222858, 705086337749090315]
 
 #Version, basically self tracking our updates
 VERSION = 're-1.11'
@@ -37,7 +38,24 @@ async def on_command_error(ctx, error):
 async def on_message(message):
     if 'order 66' in message.content.lower():
         await message.channel.send('It will be done, my Lord.')
+    if message.channel in [bot.get_channel(x) for x in POLL_CHANNELS]:
+        emojis = await check_poll(message)
+        if len(emojis) >= 3:
+            await add_reactions(message, emojis)
     await bot.process_commands(message)
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    user = bot.get_user(payload.user_id)
+    if user == bot.user: #return now to avoid api calls.
+        return
+    message = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+    reaction = next(x for x in message.reactions if str(x.emoji) == str(payload.emoji))
+    if reaction.me:
+        for i in reaction.message.reactions:
+            if reaction != i and user in await i.users().flatten() and i.me:
+                await reaction.remove(user)
+                return
 
 
 @bot.event
@@ -151,31 +169,30 @@ async def _info(ctx, *, member: typing.Optional[discord.Member]):
 @bot.command(name="ping")
 async def _ping(ctx):
     """Pong!"""
-    from time import time
-    s = time()*10000
-    m = await ctx.send("Ping! :ping_pong:")
-    p = int(time()*10000 - s)/10.0
-    await m.edit(content="Pong, {}ms! :ping_pong: ".format(p))
-    
-#this is so hopelessly broken, kitty please for the love of god help me fix this
+    await ctx.send("Pong, {}ms! :ping_pong:".format(int(bot.latency*10000)/10.0))
+
+
+@commands.has_permissions(manage_messages=True) #permission needed to remove reactions
 @bot.command(name="poll")
-async def _poll(ctx, text, *options):
-    """Create a poll, limited to 10 options. currently kinda broken"""
-    reactions = ['regional_indicator_a', 'regional_indicator_b', 'regional_indicator_c', 'regional_indicator_d', 'regional_indicator_e', 'regional_indicator_f', 'regional_indicator_g', 'regional_indicator_h', 'regional_indicator_i', 'regional_indicator_j']
-    message = text + '\n'
-    options = list(options)
-    # # old ping code, re add later if needed? 
-    # # this could have been abused by anyone for a while lol
-    # if 'ping' in options:
-    #     options.remove('ping')
-    #     message = "@everyone " + message
-    # # needed done for later for adding the right reactions.
-    reactions = reactions[:len(options)]
-    for i in zip(reactions, options):
-        message += "\n{0}: {1}".format(i[0], i[1])
-    msg = await ctx.send(message)
-    for i in reactions:
-        await msg.add_reaction(i)
+async def _poll(ctx, *emotes):
+    """makes the *above* message a poll, optionally providing options
+    
+    by default, scans the message for options for a poll
+    if none are found, uses yes and no options.
+    
+    optionally takes arguments of a list of options.
+    this list will very likely *not* be sorted properly when applied."""
+    msg = (await ctx.channel.history(before=ctx.message, limit=1).flatten())[0]
+    if len(emotes) == 0:
+        emotes = await check_poll(msg) or ['\u2705', '\u274c'] # :white_check_mark: and :x:
+    else:
+        emotes = [x for x in emotes if x in [chr(y) for y in range(127462, 127462+26)] + [str(z) for z in bot.emojis]]
+        # this hurts me to see but it's the most efficient way to do this, also this for some reason fucks up the sorting
+    if len(emotes) == 1:
+        await ctx.send("there's not enough options to make this a poll!")
+    elif len(emotes) > 1:
+        await add_reactions(msg, emotes)
+        await ctx.message.delete()
 
 
 @commands.has_role('BunnyDev')
@@ -286,6 +303,22 @@ async def _adminlinks(ctx):
         await ctx.author.send(f.read())
     
 # Internals
+
+# Utils
+async def check_poll(message):
+    e = []
+    for i in range(127462, 127462+26): # 127462 is the unicode value for :regional_indicator_a:, the next 25 are the other letters
+        if '\n'+chr(i) in message.clean_content:
+            e.append(chr(i))
+    for i in bot.emojis: # all *custom* emojis, sadly can't use builtins for this very well.  
+        if '\n'+str(i) in message.clean_content:
+            e.append(str(i))
+    return e
+
+async def add_reactions(message, emojis):
+    for i in emojis:
+        await message.add_reaction(i)
+
 
 # Error Handling
 @_rules_discord.error
