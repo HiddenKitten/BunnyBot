@@ -31,7 +31,7 @@ async def on_command_error(ctx, error):
         return await ctx.send_help(ctx.command)
     elif isinstance(error, commands.CommandNotFound):
         return # ignore unfound commands for now. no reason to care, just would cause spam in console, or chat.
-    print("command '{}' with args '{}' raised exception: '{}'".format(ctx.command, ctx.message.content[len(ctx.invoked_with)+len(ctx.prefix)+1:], error.original))
+    print("command '{}' with args '{}' raised exception: '{}'".format(ctx.command, ctx.message.content[len(ctx.invoked_with)+len(ctx.prefix)+1:], error))
 
 @bot.event
 async def on_message(message):
@@ -227,22 +227,54 @@ async def _clean(ctx, last: int, user: typing.Optional[discord.Member], after: t
     await ctx.message.delete(delay=5)
 
 
-@bot.command(name="rules", aliases=['rule'])
-async def _Rules(ctx):
+@bot.group(invoke_without_command=True, name="rules", aliases=['rule'])
+async def _rules(ctx):
     """Rules for every server and the discord."""
-    with open('data/rules.txt') as f:
-        await ctx.send(f.read())
+    await ctx.send_help(ctx.command)
 
+@_rules.command(name='discord')
+async def _rules_discord(ctx, num: typing.Optional[int]):
+    """MeeMTeam Discord rules. 
+    links to the rules channel instead of posting them all"""
+    with open('data/rules/discord.txt') as f:
+        if num != None and num > 0:
+            await ctx.send(f.readlines()[num-1])
+        else: await ctx.send('<#385827282368987141>') #this is a bad hardcoded value. but it's fine. 
 
+@_rules.command(name='tf2')
+async def _rules_tf2(ctx, num: typing.Optional[int]):
+    """MeeMTeam tf2 rules"""
+    with open('data/rules/tf2.txt') as f:
+        if num != None and num > 0:
+            await ctx.send(f.readlines()[num-1])
+        else: await ctx.send(f.read())
+
+@_rules.command(name='minecraft', aliases=['mc'])
+async def _rules_minecraft(ctx, num: typing.Optional[int]):
+    """MeeMTeam Minecraft rules"""
+    with open('data/rules/minecraft.txt') as f:
+        if num != None and num > 0:
+            await ctx.send(f.readlines()[num-1])
+        else: await ctx.send(f.read())
 
 # Internals
 
 # Error Handling
-
-# @_info.error # obsolete error code.
-# async def _info_error(ctx, error):
-#     if isinstance(error, commands.BadArgument):
-#         await ctx.send('I could not find that member...')
+@_rules_discord.error
+@_rules_tf2.error
+@_rules_minecraft.error 
+async def _rules_error(ctx, error):
+    if isinstance(error, commands.CommandInvokeError):
+        if isinstance(error.original, IndexError):
+            if ctx.args[1] < 100:
+                await ctx.send('Was that a typo? There isn\'t that many rules!')
+            else:
+                await ctx.send('Having that many rules would s-scare meee! \nI-I\'d also never remember all of them...')
+        #pass error on to the default handler. 
+        else: 
+            on_command_error(ctx, error) 
+    else:
+        on_command_error(ctx, error)
 
 
 # Running
