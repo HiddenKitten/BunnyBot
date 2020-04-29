@@ -198,6 +198,8 @@ async def _version(ctx):
     """shows the version info"""
     await ctx.send("Version " + VERSION)
 
+# Server Specific Commands
+
 @bot.command(name="patreon")
 async def _patreon(ctx):
     """sends patreon link"""
@@ -223,6 +225,15 @@ async def _clean(ctx, last: int, user: typing.Optional[discord.Member], after: t
     for i in chunks:
         await ctx.channel.delete_messages(i)
     await ctx.message.delete(delay=5)
+
+
+@bot.command(name="rules", aliases=['rule'])
+async def _Rules(ctx):
+    """Rules for every server and the discord."""
+    with open('data/rules.txt') as f:
+        await ctx.send(f.read())
+
+
 
 # Internals
 
