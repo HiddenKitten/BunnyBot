@@ -53,7 +53,7 @@ async def is_owner(ctx):
 async def is_meemteam_admin(ctx):
     server = bot.get_guild(363926644672692230)
     member = server.get_member(ctx.author.id)
-    return 469165398970073102 in member.roles
+    return server.get_role(469165398970073102) in member.roles
 
 
 # Commands
@@ -276,7 +276,7 @@ async def _ban(ctx, member : discord.Member, *, reason=None):
 
 @commands.check(is_meemteam_admin)
 @bot.command(name="deafen")
-async def _deafen(ctx, member: discord.Member *, reason=None):
+async def _deafen(ctx, member: discord.Member, *, reason=None):
     await member.edit(reason=reason, deafen=True)
 
 @commands.check(is_meemteam_admin)
