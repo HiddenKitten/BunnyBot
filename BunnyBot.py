@@ -9,7 +9,7 @@ OWNERS = [266079468135776258, 89032716896460800]
 PATREON_EXT = 'MeeMTeam'
 
 #Version, basically self tracking our updates
-VERSION = 're-1.10'
+VERSION = 're-1.11'
 
 bot = commands.Bot("bb ", activity=discord.Game(
     name="Playing with my food!"))
@@ -49,6 +49,11 @@ async def on_ready():
 
 async def is_owner(ctx):
     return ctx.author.id in OWNERS
+
+async def is_meemteam_admin(ctx):
+    server = bot.get_guild(363926644672692230)
+    member = server.get_member(ctx.author.id)
+    return 469165398970073102 in member.roles
 
 
 # Commands
@@ -257,6 +262,29 @@ async def _rules_minecraft(ctx, num: typing.Optional[int]):
             await ctx.send(f.readlines()[num-1])
         else: await ctx.send(f.read())
 
+@commands.check(is_meemteam_admin)
+@bot.command(name="kick")
+async def _kick(ctx, member : discord.Member, *, reason=None):
+    """Kicks a member, with or without a reason"""
+    await member.kick(reason=reason)
+    
+@commands.check(is_meemteam_admin)
+@bot.command(name="ban")
+async def _ban(ctx, member : discord.Member, *, reason=None):
+    """Bans a user, with or without a reason"""
+    await member.ban (reason=reason)
+
+@commands.check(is_meemteam_admin)
+@bot.command(name="deafen")
+async def _deafen(ctx, member: discord.Member *, reason=None):
+    await member.edit(reason=reason, deafen=True)
+
+@commands.check(is_meemteam_admin)
+@bot.command(name='adminlinks')
+async def _adminlinks(ctx):
+    with open('data/admin.txt') as f:
+        await ctx.author.send(f.read())
+    
 # Internals
 
 # Error Handling
