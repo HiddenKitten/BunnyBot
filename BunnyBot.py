@@ -222,6 +222,17 @@ async def _version(ctx):
 
 # Server Specific Commands
 
+@bot.command(name="IP")
+async def _IP(ctx):
+    """Sends all the ways to connect to our servers!"""
+    e = discord.Embed(title="MeeMTeam Servers!", description="How to connect to our servers!")
+    e.add_field(name="TF2: open console, type ```connect meemteam.co```")
+    e.add_field(name="Minecraft: Add server, meemteam.co, default port")
+    e.add_field(name="Quake: join, ip is meemteam.co with default port")
+    e.add_field(name="Anything in general is connect meemteam.co basically, if you need help ping adminstrator role, one of us will be able to help you")
+    await ctx.send(embed=e)
+
+
 @bot.command(name="patreon")
 async def _patreon(ctx):
     """sends patreon link"""
