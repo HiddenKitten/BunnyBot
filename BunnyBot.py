@@ -13,7 +13,7 @@ POLL_CHANNELS = [390935424694222858, 705086337749090315]
 VERSION = 're-1.11'
 
 bot = commands.Bot("bb ", activity=discord.Game(
-    name="Playing with my food!"))
+    name="Gaining Sentience.... error 500 internal server error"))
 
 # Events
 @bot.event
@@ -301,7 +301,25 @@ async def _deafen(ctx, member: discord.Member, *, reason=None):
 async def _adminlinks(ctx):
     with open('data/admin.txt') as f:
         await ctx.author.send(f.read())
-    
+
+# @bot.command(name='gameservers', aliases=['servers'])
+# async def _gameservers(ctx):
+#     from utils import tf2, q3
+#     tf2 = await tf2.tf2ping()
+#     quake = await q3.q3ping()
+#     e = discord.Embed(title='Team Fortress 2', description=tf2['name'])
+#     for k, v in tf2.items():
+#         if k != 'name':
+#             e.add_field(name=k, value=v)
+#     await ctx.send(embed=e)
+#     s = ['name-------- frags ping'] 
+#     for i in quake[1]:
+#         s.append('{0:-<12} {1:-<5} {2:-<4}'.format(i['name'].strip('"'), i['frags'], i['ping']))
+#     e = discord.Embed(title='Quake 3 Arena', description='\n'.join(s))
+#     for k, v in quake[0].items():
+#         e.add_field(name=k, value=v)
+#     await ctx.send(embed=e)
+
 # Internals
 
 # Utils
