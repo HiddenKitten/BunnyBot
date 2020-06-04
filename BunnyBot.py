@@ -13,7 +13,7 @@ POLL_CHANNELS = [390935424694222858, 705086337749090315]
 VERSION = 're-1.11'
 
 bot = commands.Bot("bb ", activity=discord.Game(
-    name="Becoming Pi-Powered!"))
+    name="Now Pi-Powered!"))
 
 # Events
 @bot.event
@@ -21,9 +21,9 @@ async def on_command_error(ctx, error):
     """The event triggered when an error is raised while invoking a command.
     ctx   : Context
     error : Exception"""
-    if hasattr(ctx.command, 'on_error'):
-        return
-    elif isinstance(error, commands.NoPrivateMessage):
+    # if hasattr(ctx.command, 'on_error'): # whatever. this is fine. 
+    #     return
+    if isinstance(error, commands.NoPrivateMessage):
         try:
             return await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
         except:
@@ -266,12 +266,31 @@ async def _rules(ctx):
     await ctx.send_help(ctx.command)
 
 @_rules.command(name='discord')
-async def _rules_discord(ctx, num: typing.Optional[int]):
+async def _rules_discord(ctx, rule: typing.Optional[typing.Union[int, str]]):
     """MeeMTeam Discord rules. 
     links to the rules channel instead of posting them all"""
+    if isinstance(rule, str):
+        topics = [
+                ['topic'], 
+                ['porn'], 
+                ['civil','drama','respect'], 
+                ['shitpost','vcabuse'], 
+                ['pg','party'], 
+                ['vent','venting'], 
+                ['gfreaction','vote'], 
+                ['earrape','er'], 
+                ['micspam','ms'], 
+                ['musicbot','mb'], 
+                ['bunnybot','bb']
+            ] #Another hardcoded list, this may need to be looked at to do more efficiently. 
+        rule = [index1 for index1,value1 in enumerate(topics) for index2,value2 in enumerate(value1) if value2==rule][0] or False
+        if rule == False:
+            await ctx.send("I don't know what rule that is.")
+    else:
+        rule -= 1
     with open('data/rules/discord.txt') as f:
-        if num != None and num > 0:
-            await ctx.send(f.readlines()[num-1])
+        if rule != None and rule >= 0:
+            await ctx.send(f.readlines()[rule])
         else: await ctx.send('<#385827282368987141>') #this is a bad hardcoded value. but it's fine. 
 
 @_rules.command(name='tf2')
@@ -323,7 +342,7 @@ async def _gameservers(ctx):
         if k in ['map', 'players', 'maxplayers', 'secured', 'version']:
             e.add_field(name=k, value=v)
     e.add_field(name='IP', value='meemteam.co')
-    e.color = discord.Colour.green()
+    e.colour = discord.Colour.green()
     await ctx.send(embed=e)
     s = ['name-------- frags ping'] 
     for i in quake[1]:
@@ -333,7 +352,7 @@ async def _gameservers(ctx):
         if k in ['mapname', 'timelimit', 'fraglimit']:
             e.add_field(name=k, value=v)
     e.add_field(name='IP', value='meemteam.co')
-    e.color = discord.Colour.green()
+    e.colour = discord.Colour.green()
     await ctx.send(embed=e)
 
 # Internals
@@ -365,11 +384,6 @@ async def _rules_error(ctx, error):
                 await ctx.send('Was that a typo? There isn\'t that many rules!')
             else:
                 await ctx.send('Having that many rules would s-scare meee! \nI-I\'d also never remember all of them...')
-        #pass error on to the default handler. 
-        else: 
-            on_command_error(ctx, error) 
-    else:
-        on_command_error(ctx, error)
 
 
 # Running
