@@ -13,7 +13,7 @@ POLL_CHANNELS = [390935424694222858, 705086337749090315]
 VERSION = 're-1.11'
 
 bot = commands.Bot("bb ", activity=discord.Game(
-    name="Gaining Sentience.... error 500 internal server error"))
+    name="Becoming Pi-Powered!"))
 
 # Events
 @bot.event
