@@ -283,9 +283,11 @@ async def _rules_discord(ctx, rule: typing.Optional[typing.Union[int, str]]):
                 ['musicbot','mb'], 
                 ['bunnybot','bb']
             ] #Another hardcoded list, this may need to be looked at to do more efficiently. 
-        rule = [index1 for index1,value1 in enumerate(topics) for index2,value2 in enumerate(value1) if value2==rule][0] or False
-        if rule == False:
+        try:
+            rule = [index1 for index1,value1 in enumerate(topics) for index2,value2 in enumerate(value1) if value2==rule][0]
+        except IndexError:
             await ctx.send("I don't know what rule that is.")
+            return
     else:
         rule -= 1
     with open('data/rules/discord.txt') as f:
