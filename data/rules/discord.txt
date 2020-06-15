@@ -8,4 +8,4 @@
 -dont ear rape.
 -dont micspam.
 -do not use the voicechat-bots for anything other then to listen to music or podcasts
--for each of the tf2 servers rules do bb tf2, for minecraft do bb minecraft in <#441770940372877324> for  each game servers rules.
+-for each of the tf2 servers rules do `bb tf2`, for minecraft do `bb minecraft` in <#441770940372877324> for each game servers rules.

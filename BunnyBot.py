@@ -261,9 +261,12 @@ async def _clean(ctx, last: int, user: typing.Optional[discord.Member], after: t
 
 
 @bot.group(invoke_without_command=True, name="rules", aliases=['rule'])
-async def _rules(ctx):
+async def _rules(ctx, rule: typing.Optional[typing.Union[int, str]]):
     """Rules for every server and the discord."""
-    await ctx.send_help(ctx.command)
+    if rule:
+        await _rules_discord(ctx, rule)
+    else:
+        await ctx.send_help(ctx.command)
 
 @_rules.command(name='discord')
 async def _rules_discord(ctx, rule: typing.Optional[typing.Union[int, str]]):
