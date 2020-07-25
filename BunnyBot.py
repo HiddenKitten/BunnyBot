@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import typing
+import logging
 from discord.ext import commands
 from datetime import datetime, timedelta
 
@@ -8,6 +9,15 @@ from datetime import datetime, timedelta
 OWNERS = [266079468135776258, 89032716896460800]
 PATREON_EXT = 'MeeMTeam'
 POLL_CHANNELS = [390935424694222858, 705086337749090315]
+
+#enable the logger as discord's default.
+logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger('discord')
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler(filename='logs/discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 #Version, basically self tracking our updates
 VERSION = 're-1.11'
