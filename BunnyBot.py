@@ -13,9 +13,15 @@ POLL_CHANNELS = [390935424694222858, 705086337749090315]
 #enable the logger as discord's default.
 logging.basicConfig(level=logging.INFO)
 
+try:
+    import os
+    os.mkdir('logs', 751)
+except FileExistsError:
+    pass
+
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
-handler = logging.FileHandler(filename='logs/discord.log', encoding='utf-8', mode='w')
+handler = logging.FileHandler(filename='logs/{date:%Y-%m-%d_%H-%M-%S}.log'.format( date=datetime.now() ), encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
