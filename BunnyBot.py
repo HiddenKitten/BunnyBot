@@ -5,9 +5,6 @@ import logging
 from discord.ext import commands
 from datetime import datetime
 
-
-
-
 load_on_startup = ["main", "fun", "polls"]
 
 #enable the logger as discord's default.
@@ -54,20 +51,6 @@ async def on_command_error(ctx, error):
 @bot.event
 async def on_ready():
     print('Connected Successfully! Bunny Bot Version %s' % bot.VERSION)
-
-
-
-# Server Specific Commands
-
-@bot.command(name="ip")
-async def _ip(ctx):
-    """Sends all the ways to connect to our servers!"""
-    e = discord.Embed(title="MeeMTeam Servers!", description="How to connect to our servers!")
-    e.add_field(name="TF2", value="click this: steam://connect/meemteam.co\nor open the console, type `connect meemteam.co`")
-    e.add_field(name="Minecraft", value="Add server, address is `meemteam.co`")
-    e.add_field(name="Quake", value="'specify', meemteam.co with the default port")
-    e.add_field(name="Anything else", value="in general, the steps are just connect to `meemteam.co`, however you would any other server. If you need help, then ping the adminstrator role, one of us will be able to help you!")
-    await ctx.send(embed=e)
 
 # Running
 

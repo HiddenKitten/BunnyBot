@@ -2,8 +2,9 @@ import asyncio
 import discord
 import typing
 import json
-from discord.ext import commands
+from discord.ext import commands, tasks
 from datetime import datetime, timedelta
+
 
 class Main(commands.Cog):
 
@@ -210,7 +211,15 @@ class Main(commands.Cog):
             else: await ctx.send(f.read())
 
 
-    #Error handling
+    @commands.command(name="ip")
+    async def _ip(self, ctx):
+        """Sends all the ways to connect to our servers!"""
+        e = discord.Embed(title="MeeMTeam Servers!", description="How to connect to our servers!")
+        e.add_field(name="TF2", value="click this: steam://connect/meemteam.co\nor open the console, type `connect meemteam.co`")
+        e.add_field(name="Minecraft", value="Add server, address is `meemteam.co`")
+        e.add_field(name="Quake", value="'specify', meemteam.co with the default port")
+        e.add_field(name="Anything else", value="in general, the steps are just connect to `meemteam.co`, however you would any other server. If you need help, then ping the adminstrator role, one of us will be able to help you!")
+        await ctx.send(embed=e)
 
     # Error Handling
     @_rules_discord.error
@@ -224,6 +233,19 @@ class Main(commands.Cog):
                 else:
                     await ctx.send('Having that many rules would s-scare meee! \nI-I\'d also never remember all of them...')
 
+    #always loop
+    @tasks.loop(seconds=15.0)
+    async def _random_status(self):
+        if self.cfg['rndStatus']:
+            from random import choice
+            a = discord.Game(choice(self.cfg["Statuses"]))
+            await self.bot.change_presence(activity=a, status=discord.Status.online)
+
+    @_random_status.before_loop
+    async def _before_loops(self):
+        await self.bot.wait_until_ready()
 
 def setup(bot):
-    bot.add_cog(Main(bot))
+    n = Main(bot)
+    n._random_status.start()
+    bot.add_cog(n)
