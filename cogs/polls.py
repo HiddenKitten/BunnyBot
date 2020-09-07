@@ -4,16 +4,12 @@ import typing
 import json
 from discord.ext import commands
 
-with open("data/private/polls.json") as f:
-    poll_cfg = json.load(f)
-
-
-
 class Polls(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-
+        with open("data/private/polls.json") as f:
+            self.poll_cfg = json.load(f)
     #utils
 
     async def check_poll(self, message):
@@ -33,7 +29,7 @@ class Polls(commands.Cog):
     #Listener
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.channel in [self.bot.get_channel(x) for x in poll_cfg["Poll_Channels"]]:
+        if message.channel in [self.bot.get_channel(x) for x in self.poll_cfg["Poll_Channels"]]:
             emojis = await self.check_poll(message)
             if len(emojis) >= 3:
                 await self.add_reactions(message, emojis)

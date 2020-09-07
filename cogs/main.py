@@ -5,15 +5,10 @@ import json
 from discord.ext import commands
 from datetime import datetime, timedelta
 
-with open("data/private/main.json") as f:
-    cfg = json.load(f)
-
-
-
 class Main(commands.Cog):
 
     async def is_owner(self, ctx):
-        return ctx.author.id in cfg["Owners"]
+        return ctx.author.id in self.cfg["Owners"]
 
     async def is_meemteam_admin(self, ctx):
         server = self.bot.get_guild(363926644672692230)
@@ -22,6 +17,8 @@ class Main(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        with open("data/private/main.json") as f:
+            self.cfg = json.load(f)
 
     @commands.command(name="changelog", aliases=['changes'])
     async def _changelog(self, ctx):
@@ -41,7 +38,7 @@ class Main(commands.Cog):
     @commands.command(name="patreon")
     async def _patreon(self, ctx):
         """sends patreon link"""
-        await ctx.send("I'm glad you're thinking of supporting our work!\nhttps://www.patreon.com/" + cfg["Patreon_ext"])
+        await ctx.send("I'm glad you're thinking of supporting our work!\nhttps://www.patreon.com/" + self.cfg["Patreon_ext"])
 
     @commands.has_permissions(manage_messages=True)
     @commands.command(name="clean")
