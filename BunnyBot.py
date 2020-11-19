@@ -1,11 +1,9 @@
-import asyncio
 import discord
-import typing
 import logging
 from discord.ext import commands
 from datetime import datetime
 
-load_on_startup = ["main", "fun", "polls"]
+load_on_startup = ["main", "fun", "polls", "gameservers"]
 
 #enable the logger as discord's default.
 
@@ -21,7 +19,11 @@ logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
 handler = logging.FileHandler(filename='logs/{date:%Y-%m-%d_%H-%M-%S}.log'.format( date=datetime.now() ), encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+handler2 = logging.FileHandler(filename='logs/latest.log', encoding='utf-8', mode='w')
+handler2.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
+logger.addHandler(handler2)
+logger = logger.getChild('bunny')
 
 bot = commands.Bot("bb ", activity=discord.Game(
     name="Modularized!"))
@@ -46,11 +48,11 @@ async def on_command_error(ctx, error):
         return await ctx.send_help(ctx.command)
     elif isinstance(error, commands.CommandNotFound):
         return # ignore unfound commands for now. no reason to care, just would cause spam in console, or chat.
-    print("command '{}' with args '{}' raised exception: '{}'".format(ctx.command, ctx.message.content[len(ctx.invoked_with)+len(ctx.prefix)+1:], error))
+    logger.error("command '{}' with args '{}' raised exception: '{}'".format(ctx.command, ctx.message.content[len(ctx.invoked_with)+len(ctx.prefix)+1:], error))
 
 @bot.event
 async def on_ready():
-    print('Connected Successfully! Bunny Bot Version %s' % bot.VERSION)
+    logger.info('Connected Successfully! Bunny Bot Version %s' % bot.VERSION)
 
 # Running
 

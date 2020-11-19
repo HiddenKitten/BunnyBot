@@ -1,5 +1,0 @@
-server control: http://meemteam.co:9000/#/auth
-sourcebans++: http://meemteam.co/sbpp/index.php?p=login
-direct ip: 74.91.114.165 (use this for WinSCP/PuTTY)
-
-if you need an account registered for any of this, message <@89032716896460800>

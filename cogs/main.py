@@ -95,37 +95,6 @@ class Main(commands.Cog):
     async def _deafen(self, ctx, member: discord.Member, *, reason=None):
         await member.edit(reason=reason, deafen=True)
 
-    @commands.check(is_meemteam_admin)
-    @commands.command(name='adminlinks')
-    async def _adminlinks(self, ctx):
-        with open('data/admin.txt') as f:
-            await ctx.author.send(f.read())
-
-    @commands.command(name='gameservers', aliases=['servers'])
-    async def _gameservers(self, ctx):
-        from utils import tf2, q3
-
-        tf2 = await tf2.tf2ping()
-        e = discord.Embed(title='Team Fortress 2', description=tf2['name'])
-        for k, v in tf2.items():
-            if k in ['map', 'players', 'maxplayers', 'secured', 'version']:
-                e.add_field(name=k, value=v)
-        e.add_field(name='IP', value='meemteam.co')
-        e.colour = discord.Colour.green()
-        await ctx.send(embed=e)
-
-        quake = await q3.q3ping()
-        s = ['name-------- frags ping']
-        for i in quake[1]:
-            s.append('{0:-<12} {1:-<5} {2:-<4}'.format(i['name'].strip('"'), i['frags'], i['ping']))
-        e = discord.Embed(title=quake[0]['sv_hostname'], description='\n'.join(s))
-        for k, v in quake[0].items():
-            if k in ['mapname', 'timelimit', 'fraglimit']:
-                e.add_field(name=k, value=v)
-        e.add_field(name='IP', value='meemteam.co')
-        e.colour = discord.Colour.green()
-        await ctx.send(embed=e)
-
     @commands.command(name="ping")
     async def _ping(self, ctx):
         """Pong!"""
@@ -247,5 +216,5 @@ class Main(commands.Cog):
 
 def setup(bot):
     n = Main(bot)
-    n._random_status.start()
+    n._random_status.start() # pylint: disable=no-member
     bot.add_cog(n)
