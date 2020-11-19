@@ -2,12 +2,13 @@ import discord
 # import json
 from discord.ext import commands
  
-class Polls(commands.Cog):
+class Gameservers(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
         # with open("data/private/gameservers.json") as f: 
         #     self.poll_cfg = json.load(f)
+
     #utils
 
     #commands
@@ -47,3 +48,6 @@ class Polls(commands.Cog):
         e.add_field(name='IP', value='meemteam.co')
         e.colour = discord.Colour.green()
         await ctx.send(embed=e)
+
+def setup(bot):
+    bot.add_cog(Gameservers(bot))
