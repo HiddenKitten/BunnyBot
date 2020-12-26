@@ -5,21 +5,16 @@ import json
 from discord.ext import commands, tasks
 from datetime import datetime, timedelta
 
+# predicates
+async def is_owner(ctx):
+    return ctx.author.id in ctx.bot.cfg["owners"]
 
-class Main(commands.Cog):
-
-    async def is_owner(self, ctx):
-        return ctx.author.id in self.cfg["Owners"]
-
-    async def is_meemteam_admin(self, ctx):
-        server = self.bot.get_guild(363926644672692230)
-        member = server.get_member(ctx.author.id)
-        return server.get_role(469165398970073102) in member.roles
+class Main(commands.Cog, name="BunnyBot"):
 
     def __init__(self, bot):
         self.bot = bot
-        with open("data/private/main.json") as f:
-            self.cfg = json.load(f)
+        self._rules.enabled = bot.cfg['rules']
+        self._ip.enabled=bot.cfg['ips']
 
     @commands.command(name="changelog", aliases=['changes'])
     async def _changelog(self, ctx):
@@ -39,7 +34,7 @@ class Main(commands.Cog):
     @commands.command(name="patreon")
     async def _patreon(self, ctx):
         """sends patreon link"""
-        await ctx.send("I'm glad you're thinking of supporting our work!\nhttps://www.patreon.com/" + self.cfg["Patreon_ext"])
+        await ctx.send("I'm glad you're thinking of supporting our work!\nhttps://www.patreon.com/" + ctx.bot.cfg["patreon_ext"])
 
     @commands.has_permissions(manage_messages=True)
     @commands.command(name="clean")
@@ -78,19 +73,19 @@ class Main(commands.Cog):
         e.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=e)
 
-    @commands.check(is_meemteam_admin)
+    @commands.has_permissions(kick_members=True)
     @commands.command(name="kick")
     async def _kick(self, ctx, member : discord.Member, *, reason=None):
         """Kicks a member, with or without a reason"""
         await member.kick(reason=reason)
 
-    @commands.check(is_meemteam_admin)
+    @commands.has_permissions(ban_members=True)
     @commands.command(name="ban")
     async def _ban(self, ctx, member : discord.Member, *, reason=None):
         """Bans a user, with or without a reason"""
         await member.ban (reason=reason)
 
-    @commands.check(is_meemteam_admin)
+    @commands.has_permissions(deafen_members=True)
     @commands.command(name="deafen")
     async def _deafen(self, ctx, member: discord.Member, *, reason=None):
         await member.edit(reason=reason, deafen=True)
@@ -101,8 +96,8 @@ class Main(commands.Cog):
         await ctx.send("Pong, {}ms! :ping_pong:".format(int(self.bot.latency*10000)/10.0))
 
     @commands.has_role('BunnyDev')
-    @commands.command(name='stop', hidden=True, aliases=['shutdown'])
-    async def _stop(self, ctx):
+    @commands.command(name='shutdown', hidden=True)
+    async def _shutdown(self, ctx):
         """Shuts down the bot"""
         await ctx.send("Shutting Down...")
         await self.bot.logout()
@@ -125,10 +120,20 @@ class Main(commands.Cog):
         """shows the version info"""
         await ctx.send("Version " + self.bot.VERSION)
 
+    @commands.command(name="ip")
+    async def _ip(self, ctx):
+        """Sends all the ways to connect to our servers!"""
+        e = discord.Embed(title="MeeMTeam Servers!", description="How to connect to our servers!")
+        e.add_field(name="TF2", value="click this: steam://connect/meemteam.co\nor open the console, type `connect meemteam.co`")
+        e.add_field(name="Minecraft", value="Add server, address is `meemteam.co`")
+        e.add_field(name="Quake", value="'specify', meemteam.co with the default port")
+        e.add_field(name="Anything else", value="in general, the steps are just connect to `meemteam.co`, however you would any other server. If you need help, then ping the adminstrator role, one of us will be able to help you!")
+        await ctx.send(embed=e)
+
 
     @commands.group(invoke_without_command=True, name="rules", aliases=['rule'])
     async def _rules(self, ctx, rule: typing.Optional[typing.Union[int, str]]):
-        """Rules for every server and the discord."""
+        """Rules for our servers and the discord."""
         if rule:
             await self._rules_discord(ctx, rule)
         else:
@@ -136,7 +141,7 @@ class Main(commands.Cog):
 
     @_rules.command(name='discord')
     async def _rules_discord(self, ctx, rule: typing.Optional[typing.Union[int, str]]):
-        """MeeMTeam Discord rules.
+        """Discord server rules.
         links to the rules channel instead of posting them all"""
         if isinstance(rule, str):
             topics = [
@@ -150,7 +155,7 @@ class Main(commands.Cog):
                     ['micspam','ms'],
                     ['musicbot','mb'],
                     ['bunnybot','bb']
-                ] #Another hardcoded list, this may need to be looked at to do more efficiently.
+                ]
             try:
                 rule = [index1 for index1,value1 in enumerate(topics) for index2,value2 in enumerate(value1) if value2==rule][0]
             except IndexError:
@@ -161,11 +166,11 @@ class Main(commands.Cog):
         with open('data/rules/discord.txt') as f:
             if rule != None and rule >= 0:
                 await ctx.send(f.readlines()[rule])
-            else: await ctx.send('<#385827282368987141>') #this is a bad hardcoded value. but it's fine.
+            else: await ctx.send('<#385827282368987141>')
 
     @_rules.command(name='tf2')
     async def _rules_tf2(self, ctx, num: typing.Optional[int]):
-        """MeeMTeam tf2 rules"""
+        """tf2 server rules"""
         with open('data/rules/tf2.txt') as f:
             if num != None and num > 0:
                 await ctx.send(f.readlines()[num-1])
@@ -173,22 +178,11 @@ class Main(commands.Cog):
 
     @_rules.command(name='minecraft', aliases=['mc'])
     async def _rules_minecraft(self, ctx, num: typing.Optional[int]):
-        """MeeMTeam Minecraft rules"""
+        """Minecraft server rules"""
         with open('data/rules/minecraft.txt') as f:
             if num != None and num > 0:
                 await ctx.send(f.readlines()[num-1])
             else: await ctx.send(f.read())
-
-
-    @commands.command(name="ip")
-    async def _ip(self, ctx):
-        """Sends all the ways to connect to our servers!"""
-        e = discord.Embed(title="MeeMTeam Servers!", description="How to connect to our servers!")
-        e.add_field(name="TF2", value="click this: steam://connect/meemteam.co\nor open the console, type `connect meemteam.co`")
-        e.add_field(name="Minecraft", value="Add server, address is `meemteam.co`")
-        e.add_field(name="Quake", value="'specify', meemteam.co with the default port")
-        e.add_field(name="Anything else", value="in general, the steps are just connect to `meemteam.co`, however you would any other server. If you need help, then ping the adminstrator role, one of us will be able to help you!")
-        await ctx.send(embed=e)
 
     # Error Handling
     @_rules_discord.error
@@ -205,9 +199,9 @@ class Main(commands.Cog):
     #always loop
     @tasks.loop(seconds=15.0)
     async def _random_status(self):
-        if self.cfg['rndStatus']:
+        if self.bot.cfg['rnd_status']:
             from random import choice
-            a = discord.Game(choice(self.cfg["Statuses"]))
+            a = discord.Game(choice(self.bot.cfg["statuses"]).format(prefix=self.bot.cfg["prefix"]))
             await self.bot.change_presence(activity=a, status=discord.Status.online)
 
     @_random_status.before_loop

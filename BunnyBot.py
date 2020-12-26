@@ -1,12 +1,10 @@
 import discord
 import logging
+import json
 from discord.ext import commands
 from datetime import datetime
 
-load_on_startup = ["main", "fun", "polls", "gameservers"]
-
 #enable the logger as discord's default.
-
 logging.basicConfig(level=logging.INFO)
 
 try:
@@ -17,19 +15,24 @@ except FileExistsError:
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
-handler = logging.FileHandler(filename='logs/{date:%Y-%m-%d_%H-%M-%S}.log'.format( date=datetime.now() ), encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-handler2 = logging.FileHandler(filename='logs/latest.log', encoding='utf-8', mode='w')
-handler2.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logger.addHandler(handler)
-logger.addHandler(handler2)
-logger = logger.getChild('bunny')
 
-bot = commands.Bot("bb ", activity=discord.Game(
+with open("data/bot.json") as f:
+    cfg = json.load(f)
+bot = commands.Bot(cfg['prefix'], activity=discord.Game(
     name="Modularized!"))
 
-#Version, basically self tracking our updates
-bot.VERSION = 'md-1.13'
+if cfg['log_to_file']:
+    handler = logging.FileHandler(filename='logs/{date:%Y-%m-%d_%H-%M-%S}.log'.format( date=datetime.now() ), encoding='utf-8', mode='w')
+    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    handler2 = logging.FileHandler(filename='logs/latest.log', encoding='utf-8', mode='w')
+    handler2.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    logger.addHandler(handler)
+    logger.addHandler(handler2)
+
+bot.cfg=cfg
+bot.logger = logger.getChild('bunny')
+
+bot.VERSION = '1.15'
 
 # Events
 @bot.event
@@ -37,8 +40,6 @@ async def on_command_error(ctx, error):
     """The event triggered when an error is raised while invoking a command.
     ctx   : Context
     error : Exception"""
-    # if hasattr(ctx.command, 'on_error'): # whatever. this is fine. 
-    #     return
     if isinstance(error, commands.NoPrivateMessage):
         try:
             return await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
@@ -47,22 +48,20 @@ async def on_command_error(ctx, error):
     elif isinstance(error, commands.MissingRequiredArgument):
         return await ctx.send_help(ctx.command)
     elif isinstance(error, commands.CommandNotFound):
-        return # ignore unfound commands for now. no reason to care, just would cause spam in console, or chat.
-    logger.error("command '{}' with args '{}' raised exception: '{}'".format(ctx.command, ctx.message.content[len(ctx.invoked_with)+len(ctx.prefix)+1:], error))
+        return
+    ctx.bot.logger.error("command '{}' with args '{}' raised exception: '{}'".format(ctx.command, ctx.message.content[len(ctx.invoked_with)+len(ctx.prefix)+1:], error))
 
 @bot.event
 async def on_ready():
-    logger.info('Connected Successfully! Bunny Bot Version %s' % bot.VERSION)
+    bot.logger.info('Connected Successfully! Bunny Bot Version %s' % bot.VERSION)
 
 # Running
 
 if __name__ == '__main__':
-    for extension in load_on_startup:
+    for extension in set(["main"]+cfg["startup_cogs"]): #always load the "main" cog, ignore duplicates using set.
         try:
             bot.load_extension("cogs."+extension)
         except Exception as e:
             print('Failed to load extension {extension}.')
             raise e
-    with open('.token', 'r') as f:
-        __token = f.readline()
-    bot.run(__token)
+    bot.run(cfg.pop("token"))

@@ -117,5 +117,8 @@ dmypy.json
 
 # bot private config files
 .token*
-data/private/
 logs/
+ffmpeg*
+**.json
+!**.sample.json
+data/rules/

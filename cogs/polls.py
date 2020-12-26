@@ -8,7 +8,7 @@ class Polls(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        with open("data/private/polls.json") as f:
+        with open("data/cogs/polls.json") as f:
             self.poll_cfg = json.load(f)
     #utils
 
