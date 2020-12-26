@@ -32,7 +32,7 @@ if cfg['log_to_file']:
 bot.cfg=cfg
 bot.logger = logger.getChild('bunny')
 
-bot.VERSION = '1.15'
+bot.VERSION = 'md-1.15'
 
 # Events
 @bot.event
