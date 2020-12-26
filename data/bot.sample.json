@@ -16,5 +16,6 @@
         "fun", "polls", "gameservers", "music_bot"
     ],
     "log_to_file": true,
-    "rules": false
+    "rules": false,
+    "ips":false
 }
