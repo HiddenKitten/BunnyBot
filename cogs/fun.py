@@ -63,7 +63,7 @@ class Fun(commands.Cog):
         member = ctx.author if member is None else member
         em = discord.Embed(
             description='{0}, requested by:\n{1}'.format(member, ctx.author))
-        em.set_thumbnail(url=member.avatar_url)
+        em.set_image(url=member.avatar_url)
         await ctx.send(embed=em)
 
 
