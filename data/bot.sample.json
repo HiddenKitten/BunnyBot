@@ -1,0 +1,21 @@
+{
+    "token": "",
+    "owners": [
+        89032716896460800,
+        266079468135776258
+    ],
+    "patreon_ext": "MeeMTeam",
+    "prefix":"!",
+    "rnd_status": true,
+    "statuses": [
+        "SomeStatus!",
+        "SomeOtherStatus!",
+        "say \"{prefix}help\"!"
+    ],
+    "startup_cogs": [
+        "fun", "polls", "gameservers", "music_bot"
+    ],
+    "log_to_file": true,
+    "rules": false,
+    "ips":false
+}

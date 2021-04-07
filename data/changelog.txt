@@ -1,3 +1,5 @@
+version 1.13: modularized, I actually don't remember if I added much else here.. very professional changelog, I know.
+
 version 1.11: added deafen, kick, ban, rules for every server, admin specific links
 
 version 1.10: clean command to clean messages.
